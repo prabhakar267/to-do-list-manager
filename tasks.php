@@ -2,6 +2,11 @@
 require_once 'inc/connection.inc.php';
 require_once 'inc/header.func.inc.php';
 
+$complition_tick = array(
+	"cross.png",
+	"tick.png"
+);
+
 if(!loggedin())
 	header('Location: login.php');
 
@@ -98,7 +103,7 @@ include('inc/navbar.inc.php');
 			while($query_row = mysqli_fetch_assoc($query_run)){
 				$id = $query_row['id'];
 				$done_flag = $query_row['done'];
-				$date = date('d/m/Y', $query_row['time']);
+				$date = date('jS F Y (l)', $query_row['time']);
 				$event = trim($query_row['description']);
 				
 				if($done_flag == 0)
@@ -106,10 +111,16 @@ include('inc/navbar.inc.php');
 				else
 					$done_flag_text = "Completed";
 			
-				echo '<div class="task">'."\n".'<p class="task-complition">'.$done_flag_text.'<input class="task-checkbox" type="checkbox" name="tasklist[]" value="'.$id.'"></p>'."\n".'<p class="task-desc';
+				echo '<div class="task">
+						<p class="task-date">' . $date . '</p>
+						<p class="task-complition"><img src="img/' . $complition_tick[$done_flag] .'" width="16" style="margin-bottom:5px"> ' . $done_flag_text . '<input class="task-checkbox" type="checkbox" name="tasklist[]" value="'.$id.'"></p>
+						<p class="task-desc';
+
 				if($done_flag != 0)
 					echo ' task-complete';
-				echo '">'.$event.'</p>'."\n".'<p class="task-date">'.$date.'</p>'."\n".'</div>'."\n\n";
+
+				echo '">' . $event . '</p>
+						</div>';
 			}
 		}
 		echo '</form>'."\n";
@@ -125,22 +136,22 @@ include('inc/navbar.inc.php');
 	}
 ?>
 			<div class="action-buttons <?php if($no_task_flag == 1) echo 'hidden';?>">
-				<button form="taskslist" type="submit" class="btn btn-lg btn-success" name="taskdonesubmit" <?php if($no_task_flag == 1) echo 'disabled';?>>Mark as Done</button>
-				<button form="taskslist" type="submit" class="btn btn-lg btn-success" name="deletetask-submit" <?php if($no_task_flag == 1) echo 'disabled';?>>Delete Tasks</button>
-				<button form="taskslist" type="submit" class="btn btn-lg btn-success" name="edit-tasks" <?php if($no_task_flag == 1) echo 'disabled';?>>Edit Task</button>
+				<button form="taskslist" type="submit" class="btn btn-lg btn-success not-round" name="taskdonesubmit" <?php if($no_task_flag == 1) echo 'disabled';?>>Mark as Done</button>
+				<button form="taskslist" type="submit" class="btn btn-lg btn-success not-round" name="deletetask-submit" <?php if($no_task_flag == 1) echo 'disabled';?>>Delete Tasks</button>
+				<button form="taskslist" type="submit" class="btn btn-lg btn-success not-round" name="edit-tasks" <?php if($no_task_flag == 1) echo 'disabled';?>>Edit Task</button>
 			</div>
 			<form method="POST" id="addtaskform">
 				<div class="row" style="margin: 10px auto">
 					<div class="col-md-12">
-						<textarea class="form-control" rows="6" type="text" required name="task" placeholder="Enter your task here"><?php if($edit_flag) echo $edit_task;?></textarea>
+						<textarea class="form-control not-round" rows="6" type="text" required name="task" placeholder="Enter your task here"><?php if($edit_flag) echo $edit_task;?></textarea>
 					</div>
 				</div>
 				<div class="row" style="margin: 10px auto">
 					<div class="col-md-4 col-sm-4 col-xs-4">
-						<input type="text" placeholder="Date" class="form-control" required name="day" value="<?php if($edit_flag) echo $edit_day;?>">
+						<input type="text" placeholder="Date" class="form-control not-round" required name="day" value="<?php if($edit_flag) echo $edit_day;?>">
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-4">
-						<select name="month" class="form-control" value="<?php if($edit_flag) echo $edit_month;?>">
+						<select name="month" class="form-control not-round" value="<?php if($edit_flag) echo $edit_month;?>">
 <?php
 for ($i=1;$i<=12;$i++){
 	if($edit_flag && $i == $edit_month)
@@ -152,12 +163,12 @@ for ($i=1;$i<=12;$i++){
 						</select>
 					</div>
 					<div class="col-md-4 col-sm-4 col-xs-4">
-						<input type="text" required placeholder="Year" class="form-control" name="year" value="<?php if($edit_flag) echo $edit_year;?>">
+						<input type="text" required placeholder="Year" class="form-control not-round" name="year" value="<?php if($edit_flag) echo $edit_year;?>">
 					</div>
 				</div>
 				<div class="row submit-button-row" style="margin-top:20px;">
 					<div class="col-md-10 col-md-offset-1">
-						<button form="addtaskform" type="submit" class="btn btn-lg btn-block btn-primary" name="submit">Add Task</button>
+						<button form="addtaskform" type="submit" class="btn btn-lg btn-block btn-primary not-round" name="submit">Add Task</button>
 					</div>
 				</div>
 			</form>
