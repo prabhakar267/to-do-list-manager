@@ -1,3 +1,3 @@
 <?php
-	header('Location: tasks');
+	header('Location: tasks.php');
 ?>

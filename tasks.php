@@ -3,7 +3,7 @@ require_once 'inc/connection.inc.php';
 require_once 'inc/header.func.inc.php';
 
 if(!loggedin())
-	header('Location: login');
+	header('Location: login.php');
 
 $error_messages = array(
 	"Incorrect Date. Please Enter a Valid Date",
@@ -25,15 +25,15 @@ include('inc/navbar.inc.php');
 		<div class="col-md-6 task-list">
 <?php
 	if(isset($_POST['submit'])){
-		$task = mysql_real_escape_string(htmlspecialchars(@$_POST['task']));
+		$task = mysqli_real_escape_string($connection, htmlspecialchars(@$_POST['task']));
 		$day_temp = $_POST['day'];
 		$month_temp = $_POST['month'];
 		$year_temp = $_POST['year'];
 		
 		if(checkdate($month_temp, $day_temp, $year_temp)){
 			$timestamp = strtotime($day_temp.'-'.$month_temp.'-'.$year_temp);
-			$query = "INSERT INTO `todo-events` (`description`,`time`,`uid`) VALUES ('$task','$timestamp','$userID')";
-			if(!mysql_query($query))
+			$query = "INSERT INTO `events` (`description`,`time`,`uid`) VALUES ('$task','$timestamp','$userID')";
+			if(!mysqli_query($connection, $query))
 				$error = 1;
 			
 		} else {
@@ -44,8 +44,8 @@ include('inc/navbar.inc.php');
 	if(isset($_POST['taskdonesubmit'])){
 		if(count($_POST['tasklist']) >= 1){
 			foreach($_POST['tasklist'] as $selectedtasks){
-				$query = "UPDATE `todo-events` SET `done`=1 WHERE `id`='$selectedtasks'";
-				if(!mysql_query($query))
+				$query = "UPDATE `events` SET `done`=1 WHERE `id`='$selectedtasks'";
+				if(!mysqli_query($connection, $query))
 					$error = 1;
 			}
 		} else {
@@ -56,8 +56,8 @@ include('inc/navbar.inc.php');
 	if(isset($_POST['deletetask-submit'])){
 		if(count($_POST['tasklist']) >= 1){
 			foreach($_POST['tasklist'] as $selectedtasks){
-				$query = "DELETE FROM `todo-events` WHERE `id`='$selectedtasks'";
-				if(!mysql_query($query))
+				$query = "DELETE FROM `events` WHERE `id`='$selectedtasks'";
+				if(!mysqli_query($connection, $query))
 					$error = 1;
 			}
 		} else {
@@ -68,7 +68,7 @@ include('inc/navbar.inc.php');
 	if(isset($_POST['edit-tasks'])){
 		if(count($_POST['tasklist']) == 1){
 			$selectedtasks = $_POST['tasklist'][0];
-			$query_row = mysql_fetch_array(mysql_query("SELECT * FROM `todo-events` WHERE `id`='$selectedtasks' AND `uid`='$userID'"));
+			$query_row = mysqli_fetch_array(mysqli_query($connection, "SELECT * FROM `events` WHERE `id`='$selectedtasks' AND `uid`='$userID'"));
 			$edit_flag = 1;
 			$edit_task = $query_row['description'];
 			$edit_time = date('d/m/Y', $query_row['time']);
@@ -78,8 +78,8 @@ include('inc/navbar.inc.php');
 			$edit_year = $edit_time[2];
 			$edit_done = $query_row['done'];
 				
-			$query = "DELETE FROM `todo-events` WHERE `id`='$selectedtasks'";
-			if(!mysql_query($query))
+			$query = "DELETE FROM `events` WHERE `id`='$selectedtasks'";
+			if(!mysqli_query($connection, $query))
 				$error = 1;
 		} elseif(count($_POST['tasklist']) > 1) {
 			$error = 3;
@@ -88,14 +88,14 @@ include('inc/navbar.inc.php');
 		}
 	}
 
-	$query = "SELECT * FROM `todo-events` WHERE `uid`='$userID' ORDER BY `done` ASC, `time` DESC";
-	if($query_run = mysql_query($query)){
+	$query = "SELECT * FROM `events` WHERE `uid`='$userID' ORDER BY `done` ASC, `time` DESC";
+	if($query_run = mysqli_query($connection, $query)){
 		echo "\n".'<form method="POST" id="taskslist">'."\n\n";
-		if(mysql_num_rows($query_run) == 0){
+		if(mysqli_num_rows($query_run) == 0){
 			echo '<div class="task"><center>No Tasks</center></div>';
 			$no_task_flag = 1;
 		} else { 
-			while($query_row = mysql_fetch_assoc($query_run)){
+			while($query_row = mysqli_fetch_assoc($query_run)){
 				$id = $query_row['id'];
 				$done_flag = $query_row['done'];
 				$date = date('d/m/Y', $query_row['time']);

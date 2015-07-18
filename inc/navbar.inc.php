@@ -2,7 +2,7 @@
 		To-Do List Manager
 <?php
 	if(loggedin())
-		echo '<a href="logout"><button class="pull-right btn btn-danger">Logout</button></a>';
+		echo '<a href="logout.php"><button class="pull-right btn btn-danger">Logout</button></a>';
 ?>
 		<!--<button class="pull-right btn btn-danger" data-toggle="modal" data-target="#moreInfoModal">More Info</button>-->
 	</div>

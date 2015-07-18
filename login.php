@@ -1,4 +1,5 @@
 <?php
+
 require_once 'inc/connection.inc.php';
 require_once 'inc/header.func.inc.php';
 
@@ -10,31 +11,32 @@ $error_message = array(
 	"Could not process your request. Try Again",
 	"Username Already Taken",
 	"Invalid Username - Password Combination",
-	"Successfully Register. Now Please Login To Proceed",
+	"Successfully Register. Now Please Login To Proceed", //success case
 	"Username cannot have white spaces"
 );
 
 if(isset($_POST['signup-submit'])){
-	$name = strtolower(mysql_real_escape_string(htmlspecialchars($_POST['name'])));
-	$username = mysql_real_escape_string(htmlspecialchars($_POST['username']));
-	$password = md5(mysql_real_escape_string(htmlspecialchars($_POST['pass'])));
-	$confirmpassword = md5(mysql_real_escape_string(htmlspecialchars($_POST['confpass'])));
+	$name = strtolower(mysqli_real_escape_string($connection, htmlspecialchars($_POST['name'])));
+	$username = mysqli_real_escape_string($connection, htmlspecialchars($_POST['username']));
+	$password = md5(mysqli_real_escape_string($connection, htmlspecialchars($_POST['pass'])));
+	$confirmpassword = md5(mysqli_real_escape_string($connection, htmlspecialchars($_POST['confpass'])));
+	
 	if($confirmpassword != $password){
 		$error = 0;
 	} elseif(preg_match('/\s/',$username)){
 		$error = 5;
 	} else {
-		$query = "SELECT * FROM `todo-users` WHERE `username`='$username'";
-		if($query_run = mysql_query($query)){
-			if(mysql_num_rows($query_run) > 0 ){
+		$query = "SELECT * FROM `users` WHERE `username`='$username'";
+		if($query_run = mysqli_query($connection, $query)){
+			if(mysqli_num_rows($query_run) > 0 ){
 				$error = 2;
 			} else {
-				$query = "INSERT INTO `todo-users` (`username`,`password`,`name`) VALUES ('$username','$password','$name')";
-				if(!mysql_query($query))
+				$query = "INSERT INTO `users` (`username`,`password`,`name`) VALUES ('$username','$password','$name')";
+				if(!mysqli_query($connection, $query))
 					$error = 1;
 				else {
 					$error = 4;
-					header('Location : login');
+					header('Location : login.php');
 				}
 			}
 		} else {
@@ -44,20 +46,22 @@ if(isset($_POST['signup-submit'])){
 }
 
 if(isset($_POST['login-submit'])){
-	$username = mysql_real_escape_string(htmlspecialchars($_POST['login-username']));
-	$password = md5(mysql_real_escape_string(htmlspecialchars($_POST['login-pass'])));	
+
+	$username = mysqli_real_escape_string($connection, htmlspecialchars($_POST['login-username']));
+	$password = md5(mysqli_real_escape_string($connection, htmlspecialchars($_POST['login-pass'])));	
 	
-	$query = "SELECT * FROM `todo-users` WHERE `username`='$username' AND `password`='$password'";
-	if($query_run = mysql_query($query)){
-		if(mysql_num_rows($query_run) == 0 ){
+	$query = "SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'";
+	
+	if($query_run = mysqli_query($connection, $query)){
+		if(mysqli_num_rows($query_run) == 0 ){
 			$error = 3;
 		} else {
-			$query_row = mysql_fetch_assoc($query_run);
+			$query_row = mysqli_fetch_assoc($query_run);
 			
 			$_SESSION['username'] = $query_row['username'];
 			$_SESSION['name'] = $query_row['name'];
 			$_SESSION['uid'] = $query_row['uid'];
-			header('Location: tasks');
+			header('Location: tasks.php');
 		}
 	} else {
 		$error = 1;
@@ -70,7 +74,8 @@ include('inc/navbar.inc.php');
 	<div class="container" style="padding-top:50px">
 <?php 
 	if(isset($error)){
-		echo '<div class="alert alert-danger alert-dismissible" style="margin:10px 10px -10px 10px ;" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'.@$error_message[$error].'</div>';
+		$message_style = ($error == 4) ? 'success' : 'danger';
+		echo '<div class="alert alert-' . $message_style . ' alert-dismissible" style="margin:10px 10px -10px 10px ;" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'.$error_message[$error].'</div>';
 	}
 ?>	
         <div class="row">

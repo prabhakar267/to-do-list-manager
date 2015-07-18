@@ -4,5 +4,5 @@
 	if($http_referer)
 		header('Location: '.$http_referer);
 	else
-		header('Location: login');
+		header('Location: login.php');
 ?>
