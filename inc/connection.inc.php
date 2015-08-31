@@ -3,7 +3,7 @@
 	$mysql_host = 'localhost';
 	$mysql_user = 'root';
 	$mysql_pass = '696163';
-	$mysql_data = 'to-do-list-manager';
+	$mysql_data = 'mkstin_pg_projects';
 	
 	if(!@$connection = mysqli_connect($mysql_host , $mysql_user , $mysql_pass ,$mysql_data))
 		die($connect_error);
